@@ -309,6 +309,7 @@ if(frame_bytes!=-1)
 			printf("CAN interface is not CAN FD capable - sorry.\n");
 			exit(1);
 		}
+
 }
 
   if (setsockopt(s, SOL_CAN_RAW, CAN_RAW_ERR_FILTER, &err_mask, sizeof(err_mask))) {
@@ -321,6 +322,8 @@ if(frame_bytes!=-1)
      {
        setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
         ioctl(s, SIOCGIFINDEX, ifr);
+        frame->len = frame_bytes+4+8;
+      frame->can_id = canid;
      }
       addr->can_family = AF_CAN;
   addr->can_ifindex = ifr->ifr_ifindex;
