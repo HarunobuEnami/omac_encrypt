@@ -40,8 +40,8 @@ int main(int argc,char *argv[])
     struct sockaddr_can addr;
 	struct canfd_frame frame;
     struct ifreq ifr;
-    seq = 0;
     int nsec;
+    seq = 0;
     FILE* f;
         init_Rnd_cdm(0x01d0);
     if(argc!=2)
@@ -51,8 +51,9 @@ int main(int argc,char *argv[])
     if(strcmp(argv[1],"recieve")==0)
     {
         while(1){
-              ++seq;
+             
              recieve_fd(&addr,&frame,&ifr,"can0");
+              ++seq;
              printf("recieved %d frames\n",seq);
         }
        
@@ -64,8 +65,9 @@ int main(int argc,char *argv[])
             fclose(f);
             exit(0);
           } 
-            ++seq;
+            
              send_fd(&addr,&frame,&ifr,"can1");
+             ++seq;
              usleep(120000); //11 msec(10000000 nsec)から怪しくなり始める
              fprintf(f,"%d\n",nsec);
 
@@ -205,11 +207,11 @@ void macgen(unsigned char *key,char * plain,int length,unsigned char *MAC)
 void send_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname)
 {
   int s;
-  struct AES_ctx ctx;
+ static struct AES_ctx ctx;
   int length;
   uint8_t plain []= {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08};
  
-  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv);}
+  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv); printf("init\n");}
   s = initialize_can2(frame,addr,ifr,ifname,0x02,PLAIN_BYTES);
   length=makeframe(frame,plain,PLAIN_BYTES);
   AES_CTR_xcrypt_buffer(&ctx, frame->data,length -4);
@@ -220,21 +222,20 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
   int s;
   int i;
   uint32_t recieved_seq;
-  struct AES_ctx ctx;
+  static struct AES_ctx ctx;
   int length;
   int nbytes;
   unsigned int address_length =CANFD_MTU;
-  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv);}
+  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv); printf("init\n");}
     printf("OK\n");
   s = initialize_can2(frame,addr,ifr,ifname,0,-1);
     printf("OK\n");
   nbytes = recvfrom(s, frame, CANFD_MTU,0, (struct sockaddr*) addr, &address_length);
   printf("OK %d\n",nbytes);
-    AES_CTR_xcrypt_buffer(&ctx, frame->data,nbytes -4);
-  for(i=0;i<20;++i)
-  {
-    printf("%02x ",frame->data[i]);
-  }
+  printf("nbytes : %d\n",nbytes);
+  printf("frame->len : %d\n",frame->len);
+  AES_CTR_xcrypt_buffer(&ctx, frame->data,frame->len -4);
+  phex(frame->data);
   putchar('\n');
   return nbytes;
 }
@@ -246,7 +247,7 @@ static void phex(uint8_t* str)
 #elif defined(AES192)
     uint8_t len = 24;
 #elif defined(AES128)
-    uint8_t len = 16;
+    uint8_t len = 20;
 #endif
 
     unsigned char i;
