@@ -1,0 +1,263 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 4.3
+# Built for arm-unknown-linux-gnueabihf
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Mon Jul 25 16:23:31 2022
+
+# Variables
+
+# makefile (from 'Makefile', line 9)
+CFLAG = -Iinclude -DAF_CAN=PF_CAN -DPF_CAN=29 -DSO_RXQ_OVFFSET_BITS=64 -D_GNU_L=40 -DSCM_TIMESTAMPING_OPT_STATS=54 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE  -Wno-parentheses -O2 -Wall
+# environment
+LC_ALL = C
+# environment
+VSCODE_CWD = /home/harunobu
+# default
+MAKE_COMMAND := make
+# environment
+VSCODE_HANDLES_SIGPIPE = true
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# default
+.VARIABLES := 
+# environment
+PWD = /home/harunobu/Desktop/omac_encrypt
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# automatic
+%F = $(notdir $%)
+# environment
+LANG = C
+# default
+.LOADED := 
+# default
+.INCLUDE_DIRS = /usr/local/include /usr/include /usr/include
+# makefile
+MAKEFLAGS = pqrR
+# makefile
+CURDIR := /home/harunobu/Desktop/omac_encrypt
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# makefile (from 'Makefile', line 1)
+CANDUMP = candump.c lib.c
+# environment
+MFLAGS = -pqrR
+# default
+.SHELLFLAGS := -c
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# makefile (from 'Makefile', line 1)
+MAKEFILE_LIST := Makefile
+# automatic
+@F = $(notdir $@)
+# environment
+XDG_SESSION_TYPE = tty
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+*F = $(notdir $*)
+# environment
+DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en","availableLanguages":{}}
+# default
+MAKE_HOST := arm-unknown-linux-gnueabihf
+# makefile
+SHELL = /bin/sh
+# default
+MAKECMDGOALS := all
+# environment
+SHLVL = 2
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+PATH = /home/harunobu/.vscode-server/bin/3b889b090b5ad5793f524b5d1d39fda662b96a2a/bin/remote-cli:/usr/local/bin:/usr/bin:/bin:/usr/games
+# default
+MAKEFILES := 
+# environment
+LANGUAGE = ja_JP.UTF-8
+# environment
+MOTD_SHOWN = pam
+# automatic
+^F = $(notdir $^)
+# makefile (from 'Makefile', line 2)
+CANSEND = cansend.c lib.c
+# makefile (from 'Makefile', line 4)
+OMACSEND2 = omacsend2.c lib.c
+# environment
+SSH_CLIENT = 192.168.16.3 49179 22
+# automatic
+?F = $(notdir $?)
+# automatic
++F = $(notdir $+)
+# 'override' directive
+GNUMAKEFLAGS := 
+# environment
+BROWSER = /home/harunobu/.vscode-server/bin/3b889b090b5ad5793f524b5d1d39fda662b96a2a/bin/helpers/browser.sh
+# environment
+LOGNAME = harunobu
+# makefile
+.DEFAULT_GOAL := candump
+# makefile (from 'Makefile', line 5)
+OMACRECIEVE = omacrecieve.c lib.c
+# environment
+USER = harunobu
+# default
+MAKE_VERSION := 4.3
+# makefile (from 'Makefile', line 3)
+OMACSEND = omacsend.c lib.c 
+# environment
+VSCODE_AGENT_FOLDER = /home/harunobu/.vscode-server
+# environment
+_ = /home/harunobu/.vscode-server/bin/3b889b090b5ad5793f524b5d1d39fda662b96a2a/bin/code-server
+# environment
+XDG_RUNTIME_DIR = /run/user/1000
+# environment
+VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-6f347cf8-07ec-43f7-b820-3bb3cd7bf980.sock
+# makefile (from 'Makefile', line 7)
+OMAC_FD2 = omac_fd_2.c lib.c ./tiny-AES-c/aes.c 
+# environment
+XDG_SESSION_CLASS = user
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# makefile (from 'Makefile', line 6)
+OMAC_FD = omac_fd.c lib.c
+# environment
+HOME = /home/harunobu
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# environment
+XDG_SESSION_ID = 7
+# default
+.RECIPEPREFIX := 
+# automatic
+<F = $(notdir $<)
+# default
+SUFFIXES := 
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
+# makefile (from 'Makefile', line 8)
+CC = gcc
+# environment
+SSH_CONNECTION = 192.168.16.3 49179 192.168.16.31 22
+# variable set hash-table stats:
+# Load=72/1024=7%, Rehash=0, Collisions=1/102=1%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 45826, inode 270165): 14 files, no impossibilities.
+
+# 14 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-07-07 19:02:45.316905721
+#  File has been updated.
+#  Successfully updated.
+
+omacsend2:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 23):
+	$(CC) $(OMACSEND2)  -o $@  $? $(CFLAG)
+
+candump:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 13):
+	$(CC) $(CANDUMP)  -o $@  $? $(CFLAG)
+
+omac_fd2:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 32):
+	$(CC) $(OMAC_FD2)  -o $@  $? $(CFLAG)
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+omacrecieve:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 26):
+	$(CC) $(OMACRECIEVE)  -o $@  $? $(CFLAG)
+
+# Not a target:
+all:
+#  Command line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+
+omacsend:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 20):
+	$(CC) $(OMACSEND)  -o $@  $? $(CFLAG)
+
+omac_fd:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 29):
+	$(CC) $(OMAC_FD)  -o $@  $? $(CFLAG)
+
+cansend:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 17):
+	$(CC) $(CANSEND)  -o $@  $? $(CFLAG)
+
+# files hash-table stats:
+# Load=11/1024=1%, Rehash=0, Collisions=0/21=0%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 24 / storage = 218 B / avg = 9 B
+# current buf: size = 8174 B / used = 218 B / count = 24 / avg = 9 B
+
+# strcache performance: lookups = 37 / hit rate = 35%
+# hash-table stats:
+# Load=24/8192=0%, Rehash=0, Collisions=0/37=0%
+# Finished Make data base on Mon Jul 25 16:23:31 2022
+
+ 
+make: *** No rule to make target 'all'.  Stop.
+

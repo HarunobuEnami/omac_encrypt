@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/harunobu/Desktop/omac_encrypt'
+gcc candump.c lib.c  -o candump   -Iinclude -DAF_CAN=PF_CAN -DPF_CAN=29 -DSO_RXQ_OVFFSET_BITS=64 -D_GNU_L=40 -DSCM_TIMESTAMPING_OPT_STATS=54 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE  -Wno-parentheses -O2 -Wall
+make: Leaving directory '/home/harunobu/Desktop/omac_encrypt'
+ 

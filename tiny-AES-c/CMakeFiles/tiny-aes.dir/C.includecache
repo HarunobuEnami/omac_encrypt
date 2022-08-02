@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/harunobu/Desktop/omac_encrypt/tiny-AES-c/aes.c
+string.h
+-
+aes.h
+/home/harunobu/Desktop/omac_encrypt/tiny-AES-c/aes.h
+
+/home/harunobu/Desktop/omac_encrypt/tiny-AES-c/aes.h
+stdint.h
+-
+stddef.h
+-
+
