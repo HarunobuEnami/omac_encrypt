@@ -29,9 +29,10 @@ int initialize_can(struct canfd_frame *frame,struct sockaddr_can *addr,struct if
 int initialize_can2(struct canfd_frame *frame,struct sockaddr_can *addr,struct ifreq *ifr,const char *ifname,int canid,int frame_bytes);
 int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname);
 void send_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname);
-void macgen(unsigned char *key,char * plain,int length,unsigned char *MAC);
-static void phex(uint8_t* str);
-static int origin_dlc[]={0,1,2,3,4,5,6,7,8,-1,-1,-1,9,-1,-1,-1,10,-1,-1,-1,11-1,-1,-1,12-1,-1,-1,-1,-1,-1,-1,13}; //n番目がn byteのときのDLCの値を示す．無効なbyte長は-1を返す
+void macgen(unsigned char *key,char * plain,int length,unsigned char *MAC,int mac_seq);
+static void phex(uint8_t* str,int len);
+const int origin_dlc[]={0,1,2,3,4,5,6,7,8,-1,-1,-1,9,-1,-1,-1,10,-1,-1,-1,11-1,-1,-1,12-1,-1,-1,-1,-1,-1,-1,13}; //n番目がn byteのときのDLCの値を示す．無効なbyte長は-1を返す
+const int origin_dlc_inv[] ={0,1,2,3,4,5,6,7,8,12,16,20,24}; //n番目がDLCnのときのバイト長を示す
  uint8_t encrypt_key[16]= { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
   uint8_t iv[16]= { 0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff };
 uint32_t seq;
@@ -93,7 +94,7 @@ int makeframe(struct canfd_frame *frame,uint8_t * plain,int plain_byte) //フレ
 
   int i;
 memcpy(frame->data,plain,plain_byte);
- macgen(key,plain,plain_byte,MAC);
+ macgen(key,plain,plain_byte,MAC,seq);
    
 for(i=plain_byte;i<plain_byte+8;++i)
 {
@@ -187,21 +188,21 @@ int initialize_can(struct canfd_frame *frame,struct sockaddr_can *addr,struct if
   return s;
 }
 
-void macgen(unsigned char *key,char * plain,int length,unsigned char *MAC)
+void macgen(unsigned char *key,char * plain,int length,unsigned char *MAC,int mac_seq)
 {
-   if(seq==0)
+   if(mac_seq==0)
   {
     for(int i=0;i<AES_BLOCK_SIZE;i++){
 		key[i]=Rnd_byte();
     }
 	}
-  omac1_aes_128(key,plain,length,MAC);
    if(((seq&0x000000ff)==0xff)&&seq!=0){
     for(int i=0;i<AES_BLOCK_SIZE;i++){
 		key[i]=Rnd_byte()^key[i];
     	
     }
   }
+omac1_aes_128(key,plain,length,MAC);
 }
 
 void send_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname)
@@ -223,6 +224,8 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
   int i;
   uint32_t recieved_seq;
   static struct AES_ctx ctx;
+  static unsigned char key[AES_BLOCK_SIZE];
+  unsigned char MAC[AES_BLOCK_SIZE];
   int length;
   int nbytes;
   unsigned int address_length =CANFD_MTU;
@@ -235,27 +238,29 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
   printf("nbytes : %d\n",nbytes);
   printf("frame->len : %d\n",frame->len);
   AES_CTR_xcrypt_buffer(&ctx, frame->data,frame->len -4);
-  phex(frame->data);
+  recieved_seq=0;
+  recieved_seq += (uint32_t)frame->data[(frame->len-1)-3]; //一番最後がDLCでそこから3歩下がるとシーケンス番号が始まる
+  recieved_seq += ((uint32_t)(frame->data[(frame->len-1)-2])<<8);
+  recieved_seq += ((uint32_t)(frame->data[(frame->len-1)-1])<<16);
+  printf("recieved_seq %d\n",recieved_seq);
+  macgen(key,frame->data,origin_dlc_inv[frame->data[frame->len-1]],MAC,recieved_seq);
+  printf("generated mac : ");
+  phex(MAC,8);
+  printf("recieved mac : ");
+  phex(frame->data+8,8);
+  printf("data length : ");
+  phex(frame->data,20);
   putchar('\n');
   return nbytes;
 }
-static void phex(uint8_t* str)
+
+static void phex(uint8_t* str,int len)
 {
-
-#if defined(AES256)
-    uint8_t len = 32;
-#elif defined(AES192)
-    uint8_t len = 24;
-#elif defined(AES128)
-    uint8_t len = 20;
-#endif
-
     unsigned char i;
     for (i = 0; i < len; ++i)
-        printf("%.2x", str[i]);
+        printf("%.2x ", str[i]);
     printf("\n");
 }
-
 int initialize_can2(struct canfd_frame *frame,struct sockaddr_can *addr,struct ifreq *ifr,const char *ifname,int canid,int frame_bytes) //受信時，idは0frame_bytesは-1にする
 {
   int s;
