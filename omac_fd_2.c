@@ -91,18 +91,19 @@ int makeframe(struct canfd_frame *frame,uint8_t * plain,int plain_byte) //フレ
 {
   static unsigned char key[AES_BLOCK_SIZE];
   unsigned char MAC[AES_BLOCK_SIZE];
-
+  uint32_t sending_seq = seq;
   int i;
 memcpy(frame->data,plain,plain_byte);
  macgen(key,plain,plain_byte,MAC,seq);
-   
+   printf("sending mac key: ");
+   phex(key,(int)AES_BLOCK_SIZE);
 for(i=plain_byte;i<plain_byte+8;++i)
 {
   frame->data[i] = MAC[i];
 }
-	frame->data[(plain_byte+8)+0] = (uint8_t )0x000000ff&seq;
-	frame->data[(plain_byte+8)+1] =  (uint8_t )((0x0000ff00&seq)>>8) ;
-	frame->data[(plain_byte+8)+2] =  (uint8_t )((0x00ff0000&seq)>>16) ;
+	frame->data[(plain_byte+8)+0] = (uint8_t )0x000000ff&sending_seq;
+	frame->data[(plain_byte+8)+1] =  (uint8_t )((0x0000ff00&sending_seq)>>8) ;
+	frame->data[(plain_byte+8)+2] =  (uint8_t )((0x00ff0000&sending_seq)>>16) ;
 	frame->data[(plain_byte+8)+3] = origin_dlc[plain_byte];
  
   return plain_byte+8+4;
@@ -202,6 +203,8 @@ void macgen(unsigned char *key,char * plain,int length,unsigned char *MAC,int ma
     	
     }
   }
+  printf("mac plain :");
+  phex(plain,length);
 omac1_aes_128(key,plain,length,MAC);
 }
 
@@ -230,9 +233,7 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
   int nbytes;
   unsigned int address_length =CANFD_MTU;
   if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv); printf("init\n");}
-    printf("OK\n");
   s = initialize_can2(frame,addr,ifr,ifname,0,-1);
-    printf("OK\n");
   nbytes = recvfrom(s, frame, CANFD_MTU,0, (struct sockaddr*) addr, &address_length);
   printf("OK %d\n",nbytes);
   printf("nbytes : %d\n",nbytes);
@@ -244,13 +245,13 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
   recieved_seq += ((uint32_t)(frame->data[(frame->len-1)-1])<<16);
   printf("recieved_seq %d\n",recieved_seq);
   macgen(key,frame->data,origin_dlc_inv[frame->data[frame->len-1]],MAC,recieved_seq);
+   printf("recieving mac key: ");
+   phex(key,(int)AES_BLOCK_SIZE);
   printf("generated mac : ");
   phex(MAC,8);
   printf("recieved mac : ");
   phex(frame->data+8,8);
-  printf("data length : ");
-  phex(frame->data,20);
-  putchar('\n');
+
   return nbytes;
 }
 
