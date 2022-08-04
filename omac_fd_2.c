@@ -29,7 +29,7 @@ int initialize_can(struct canfd_frame *frame,struct sockaddr_can *addr,struct if
 int initialize_can2(struct canfd_frame *frame,struct sockaddr_can *addr,struct ifreq *ifr,const char *ifname,int canid,int frame_bytes);
 int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname);
 void send_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname);
-void macgen(unsigned char *key,char * plain,int length,unsigned char *MAC,int mac_seq);
+void macgen(unsigned char *key,unsigned char * plain,int length,unsigned char *MAC,int mac_seq);
 static void phex(uint8_t* str,int len);
 const int origin_dlc[]={0,1,2,3,4,5,6,7,8,-1,-1,-1,9,-1,-1,-1,10,-1,-1,-1,11-1,-1,-1,12-1,-1,-1,-1,-1,-1,-1,13}; //n番目がn byteのときのDLCの値を示す．無効なbyte長は-1を返す
 const int origin_dlc_inv[] ={0,1,2,3,4,5,6,7,8,12,16,20,24}; //n番目がDLCnのときのバイト長を示す
@@ -189,7 +189,7 @@ int initialize_can(struct canfd_frame *frame,struct sockaddr_can *addr,struct if
   return s;
 }
 
-void macgen(unsigned char *key,char * plain,int length,unsigned char *MAC,int mac_seq)
+void macgen(unsigned char *key,unsigned char * plain,int length,unsigned char *MAC,int mac_seq)
 {
    if(mac_seq==0)
   {
@@ -248,7 +248,7 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
    printf("recieving mac key: ");
    phex(key,(int)AES_BLOCK_SIZE);
   printf("generated mac : ");
-  phex(MAC,8);
+  phex(MAC+origin_dlc_inv[frame->data[frame->len-1]],8);
   printf("recieved mac : ");
   phex(frame->data+8,8);
 
