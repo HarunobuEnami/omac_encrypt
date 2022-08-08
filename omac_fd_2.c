@@ -1,4 +1,4 @@
-//メッセージ長4 bytesのバージョンの例
+//メッセージ長8 bytesのバージョンの例
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -104,7 +104,7 @@ for(i=plain_byte;i<plain_byte+8;++i)
 	frame->data[(plain_byte+8)+2] =  (uint8_t )((0x00ff0000&sending_seq)>>16) ;
 	frame->data[(plain_byte+8)+3] = origin_dlc[plain_byte];
  
-  return plain_byte+8+4;
+  return plain_byte+plain_byte+4;
 }
 
 int initialize_can(struct canfd_frame *frame,struct sockaddr_can *addr,struct ifreq *ifr,const char *ifname,int canid,int plain_bytes) //受信のときはframe_bytesを-1にする
