@@ -242,8 +242,13 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
   printf("generated mac : ");
   phex(MAC+origin_dlc_inv[frame->data[frame->len-1]],origin_dlc_inv[frame->data[frame->len-1]]);
   printf("recieved mac : ");
-  phex(frame->data+8,8);
-
+  phex(frame->data+origin_dlc_inv[frame->data[frame->len-1]],8);
+  if(memcmp(frame->data+origin_dlc_inv[frame->data[frame->len-1]],MAC+origin_dlc_inv[frame->data[frame->len-1]],origin_dlc_inv[frame->data[frame->len-1]])==0)
+  {
+    printf("valid\n");
+  }else{
+    printf("invalid\n");
+  }
   return nbytes;
 }
 
