@@ -95,8 +95,6 @@ int makeframe(struct canfd_frame *frame,uint8_t * plain,int plain_byte) //フレ
   int i;
 memcpy(frame->data,plain,plain_byte);
  macgen(key,plain,plain_byte,MAC,seq);
-   printf("sending mac key: ");
-   phex(key,(int)AES_BLOCK_SIZE);
 for(i=plain_byte;i<plain_byte+8;++i)
 {
   frame->data[i] = MAC[i];
@@ -203,8 +201,6 @@ void macgen(unsigned char *key,unsigned char * plain,int length,unsigned char *M
     	
     }
   }
-  printf("mac plain :");
-  phex(plain,length);
 omac1_aes_128(key,plain,length,MAC);
 }
 
@@ -215,7 +211,7 @@ void send_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq 
   int length;
   uint8_t plain []= {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08};
  
-  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv); printf("init\n");}
+  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv); }
   s = initialize_can2(frame,addr,ifr,ifname,0x02,PLAIN_BYTES);
   length=makeframe(frame,plain,PLAIN_BYTES);
   AES_CTR_xcrypt_buffer(&ctx, frame->data,length -4);
@@ -232,23 +228,19 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
   int length;
   int nbytes;
   unsigned int address_length =CANFD_MTU;
-  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv); printf("init\n");}
+  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv);}
   s = initialize_can2(frame,addr,ifr,ifname,0,-1);
   nbytes = recvfrom(s, frame, CANFD_MTU,0, (struct sockaddr*) addr, &address_length);
-  printf("OK %d\n",nbytes);
-  printf("nbytes : %d\n",nbytes);
-  printf("frame->len : %d\n",frame->len);
   AES_CTR_xcrypt_buffer(&ctx, frame->data,frame->len -4);
   recieved_seq=0;
   recieved_seq += (uint32_t)frame->data[(frame->len-1)-3]; //一番最後がDLCでそこから3歩下がるとシーケンス番号が始まる
   recieved_seq += ((uint32_t)(frame->data[(frame->len-1)-2])<<8);
   recieved_seq += ((uint32_t)(frame->data[(frame->len-1)-1])<<16);
-  printf("recieved_seq %d\n",recieved_seq);
   macgen(key,frame->data,origin_dlc_inv[frame->data[frame->len-1]],MAC,recieved_seq);
-   printf("recieving mac key: ");
-   phex(key,(int)AES_BLOCK_SIZE);
+  printf("recieved message ");
+  phex(frame->data,origin_dlc_inv[frame->data[frame->len-1]]);
   printf("generated mac : ");
-  phex(MAC+origin_dlc_inv[frame->data[frame->len-1]],8);
+  phex(MAC+origin_dlc_inv[frame->data[frame->len-1]],origin_dlc_inv[frame->data[frame->len-1]]);
   printf("recieved mac : ");
   phex(frame->data+8,8);
 
