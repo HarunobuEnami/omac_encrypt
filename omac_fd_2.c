@@ -45,7 +45,7 @@ int main(int argc,char *argv[])
     seq = 0;
     FILE* f;
         init_Rnd_cdm(0x01d0);
-    if(argc!=2)
+    if(argc!=3)
     {
         print_usage();
     }
@@ -53,7 +53,7 @@ int main(int argc,char *argv[])
     {
         while(1){
              
-             recieve_fd(&addr,&frame,&ifr,"can0");
+             recieve_fd(&addr,&frame,&ifr,argv[2]);
               ++seq;
              printf("recieved %d frames\n",seq);
         }
@@ -67,7 +67,7 @@ int main(int argc,char *argv[])
             exit(0);
           } 
             
-             send_fd(&addr,&frame,&ifr,"can1");
+             send_fd(&addr,&frame,&ifr,argv[2]);
              ++seq;
              usleep(120000); //11 msec(10000000 nsec)から怪しくなり始める
              fprintf(f,"%d\n",nsec);
@@ -104,7 +104,7 @@ for(i=plain_byte;i<plain_byte+8;++i)
 	frame->data[(plain_byte+8)+2] =  (uint8_t )((0x00ff0000&sending_seq)>>16) ;
 	frame->data[(plain_byte+8)+3] = origin_dlc[plain_byte];
  
-  return plain_byte+plain_byte+4;
+  return plain_byte+8+4;
 }
 
 int initialize_can(struct canfd_frame *frame,struct sockaddr_can *addr,struct ifreq *ifr,const char *ifname,int canid,int plain_bytes) //受信のときはframe_bytesを-1にする
@@ -194,12 +194,14 @@ void macgen(unsigned char *key,unsigned char * plain,int length,unsigned char *M
     for(int i=0;i<AES_BLOCK_SIZE;i++){
 		key[i]=Rnd_byte();
     }
+    printf("key init\n");
 	}
    if(((seq&0x000000ff)==0xff)&&seq!=0){
     for(int i=0;i<AES_BLOCK_SIZE;i++){
 		key[i]=Rnd_byte()^key[i];
     	
     }
+    printf("key update\n");
   }
 omac1_aes_128(key,plain,length,MAC);
 }
@@ -228,10 +230,10 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
   int length;
   int nbytes;
   unsigned int address_length =CANFD_MTU;
-  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv);}
+  if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv);printf("AES init OK!\n");}
   s = initialize_can2(frame,addr,ifr,ifname,0,-1);
   nbytes = recvfrom(s, frame, CANFD_MTU,0, (struct sockaddr*) addr, &address_length);
-  AES_CTR_xcrypt_buffer(&ctx, frame->data,frame->len -4);
+  //AES_CTR_xcrypt_buffer(&ctx, frame->data,frame->len -4);
   recieved_seq=0;
   recieved_seq += (uint32_t)frame->data[(frame->len-1)-3]; //一番最後がDLCでそこから3歩下がるとシーケンス番号が始まる
   recieved_seq += ((uint32_t)(frame->data[(frame->len-1)-2])<<8);
@@ -240,7 +242,7 @@ int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifre
   printf("recieved message ");
   phex(frame->data,origin_dlc_inv[frame->data[frame->len-1]]);
   printf("generated mac : ");
-  phex(MAC+origin_dlc_inv[frame->data[frame->len-1]],origin_dlc_inv[frame->data[frame->len-1]]);
+  phex(MAC+origin_dlc_inv[frame->data[frame->len-1]],8);
   printf("recieved mac : ");
   phex(frame->data+origin_dlc_inv[frame->data[frame->len-1]],8);
   if(memcmp(frame->data+origin_dlc_inv[frame->data[frame->len-1]],MAC+origin_dlc_inv[frame->data[frame->len-1]],origin_dlc_inv[frame->data[frame->len-1]])==0)
