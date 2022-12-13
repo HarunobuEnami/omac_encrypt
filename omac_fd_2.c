@@ -28,7 +28,7 @@ int makeframe(struct canfd_frame *frame,uint8_t * plain,int frame_byte);
 int initialize_can(struct canfd_frame *frame,struct sockaddr_can *addr,struct ifreq *ifr,const char *ifname,int canid,int frame_bytes);
 int initialize_can2(struct canfd_frame *frame,struct sockaddr_can *addr,struct ifreq *ifr,const char *ifname,int canid,int frame_bytes);
 int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname);
-void send_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname);
+int send_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname);
 void macgen(unsigned char *key,unsigned char * plain,int length,unsigned char *MAC,int mac_seq);
 static void phex(uint8_t* str,int len);
 const int origin_dlc[]={0,1,2,3,4,5,6,7,8,-1,-1,-1,9,-1,-1,-1,10,-1,-1,-1,11-1,-1,-1,12-1,-1,-1,-1,-1,-1,-1,13}; //n番目がn byteのときのDLCの値を示す．無効なbyte長は-1を返す
@@ -67,7 +67,7 @@ int main(int argc,char *argv[])
             exit(0);
           } 
             
-             send_fd(&addr,&frame,&ifr,"can1");
+             nsec = send_fd(&addr,&frame,&ifr,"can1");
              ++seq;
              usleep(120000); //11 msec(10000000 nsec)から怪しくなり始める
              fprintf(f,"%d\n",nsec);
@@ -204,18 +204,21 @@ void macgen(unsigned char *key,unsigned char * plain,int length,unsigned char *M
 omac1_aes_128(key,plain,length,MAC);
 }
 
-void send_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname)
+int send_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname)
 {
   int s;
  static struct AES_ctx ctx;
   int length;
   uint8_t plain []= {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08};
- 
+ 	struct timespec start_time, end_time;
   if(seq==0) {AES_init_ctx_iv(&ctx, encrypt_key, iv); }
   s = initialize_can2(frame,addr,ifr,ifname,0x02,PLAIN_BYTES);
+  clock_gettime(CLOCK_REALTIME, &start_time);
   length=makeframe(frame,plain,PLAIN_BYTES);
   AES_CTR_xcrypt_buffer(&ctx, frame->data,length -4);
+  clock_gettime(CLOCK_REALTIME, &end_time);
   write(s, frame, CANFD_MTU);
+  return end_time.tv_nsec - start_time.tv_nsec;
 }
 int recieve_fd(struct sockaddr_can *addr, struct canfd_frame *frame, struct ifreq *ifr,const char *ifname)
 {
