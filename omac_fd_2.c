@@ -67,11 +67,8 @@ int main(int argc,char *argv[])
             exit(0);
           } 
             
-<<<<<<< HEAD
              nsec = send_fd(&addr,&frame,&ifr,"can1");
-=======
              send_fd(&addr,&frame,&ifr,argv[2]);
->>>>>>> 01c6972c4c3d75615e9a9a7e6c0ea06742ad5db3
              ++seq;
              usleep(120000); //11 msec(10000000 nsec)から怪しくなり始める
              fprintf(f,"%d\n",nsec);
