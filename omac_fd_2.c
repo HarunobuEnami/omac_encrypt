@@ -84,7 +84,7 @@ int main(int argc,char *argv[])
 
 void print_usage(void)
 {
-    fprintf(stderr,"usage : omac_fd (send / recieve)\n");
+    fprintf(stderr,"usage : omac_fd (send / recieve) (interface name)\n");
     exit(1);
 }
 
